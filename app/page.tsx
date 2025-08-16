@@ -1,4 +1,5 @@
 import { Star, Users, Shield } from 'lucide-react';
+import Link from 'next/link';
 
 export default function HomePage() {
   return (
@@ -17,9 +18,9 @@ export default function HomePage() {
             <button className="bg-white text-[#0B1220] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
               Hemen Başla
             </button>
-            <button className="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#0B1220]">
+            <Link href="/sektorler" className="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#0B1220] inline-block">
               Sektörleri Keşfet
-            </button>
+            </Link>
           </div>
         </div>
       </section>
