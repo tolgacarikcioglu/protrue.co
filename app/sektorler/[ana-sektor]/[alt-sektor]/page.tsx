@@ -167,9 +167,12 @@ export default function AltSektorPage({
                 </div>
               </div>
 
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
-                İletişime Geç
-              </button>
+              <Link 
+                href={`/sektorler/${mainSectorKey}/${subSectorKey}/${company.id}`}
+                className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm font-medium text-center"
+              >
+                Firma Profilini Görüntüle
+              </Link>
             </div>
           ))}
         </div>
