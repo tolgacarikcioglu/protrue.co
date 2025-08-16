@@ -1,5 +1,4 @@
 import { Star, Users, Shield } from 'lucide-react';
-import Image from 'next/image';
 
 export default function HomePage() {
   return (
@@ -7,9 +6,6 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#0B1220] to-[#0F2A5F] text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex justify-center mb-6">
-            <Image src="/logo.png" alt="Protrue.co" width={200} height={80} className="h-20 w-auto" />
-          </div>
           <h1 className="text-5xl font-bold mb-6">
             Protrue.co
           </h1>
