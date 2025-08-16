@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <nav className="bg-slate-900 text-white p-4">
+        <nav className="bg-[#0B1220] text-white p-4">
           <div className="container mx-auto flex justify-between items-center">
             <div className="flex items-center">
               <Image src="/logo.svg" alt="Protrue.co" width={180} height={40} className="h-8" />
