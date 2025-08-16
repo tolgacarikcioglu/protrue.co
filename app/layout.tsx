@@ -24,7 +24,7 @@ export default function RootLayout({
             </div>
             <div className="space-x-4">
               <a href="/" className="hover:underline">Ana Sayfa</a>
-              <a href="/sectors" className="hover:underline">Sektörler</a>
+              <a href="/sektorler" className="hover:underline">Sektörler</a>
               <a href="/about" className="hover:underline">Hakkımızda</a>
               <a href="/pricing" className="hover:underline">Fiyatlar</a>
             </div>

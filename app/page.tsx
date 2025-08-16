@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <section className="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">
             Protrue.co
@@ -14,10 +14,10 @@ export default function HomePage() {
             19 ana sektörde 130+ kategori ile güvenilir profesyonellerle bağlantı kur.
           </p>
           <div className="space-x-4">
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
+            <button className="bg-white text-slate-800 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
               Hemen Başla
             </button>
-            <button className="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600">
+            <button className="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-slate-800">
               Sektörleri Keşfet
             </button>
           </div>
@@ -59,7 +59,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Hemen Başlayın</h2>
           <p className="text-xl mb-8">Profesyonel ağınızı büyütün veya ihtiyacınız olan uzmana ulaşın</p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
+          <button className="bg-white text-slate-800 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
             Ücretsiz Kayıt Ol
           </button>
         </div>
