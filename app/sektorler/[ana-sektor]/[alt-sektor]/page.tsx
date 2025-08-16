@@ -4,67 +4,8 @@ import Link from 'next/link';
 import { ChevronRight, ArrowLeft, Users, MapPin, Star } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-const companiesData: Record<string, Record<string, Array<{
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  services: string[];
-  isVerified: boolean;
-}>>> = {
-  'teknoloji': {
-    'yazilim-gelistirme': [
-      {
-        id: 'techcorp',
-        name: 'TechCorp Yazılım',
-        description: 'Modern web ve mobil uygulamalar geliştiren deneyimli ekip',
-        location: 'İstanbul, Beşiktaş',
-        rating: 4.8,
-        reviewCount: 127,
-        services: ['Web Development', 'Mobile Apps', 'UI/UX Design'],
-        isVerified: true
-      },
-      {
-        id: 'devstudio',
-        name: 'DevStudio',
-        description: 'E-ticaret ve kurumsal yazılım çözümleri',
-        location: 'Ankara, Çankaya',
-        rating: 4.6,
-        reviewCount: 89,
-        services: ['E-commerce', 'CRM Systems', 'API Development'],
-        isVerified: true
-      }
-    ],
-    'siber-guvenlik': [
-      {
-        id: 'securenet',
-        name: 'SecureNet Güvenlik',
-        description: 'Kapsamlı siber güvenlik danışmanlığı ve çözümleri',
-        location: 'İstanbul, Maslak',
-        rating: 4.9,
-        reviewCount: 156,
-        services: ['Penetration Testing', 'Security Audit', 'Compliance'],
-        isVerified: true
-      }
-    ]
-  }
-};
-
-const sectorsData: Record<string, { name: string; icon: string }> = {
-  'teknoloji': { name: 'Teknoloji', icon: '💻' },
-  'saglik': { name: 'Sağlık', icon: '🏥' },
-  'egitim': { name: 'Eğitim', icon: '🎓' }
-};
-
-const subSectorsData: Record<string, Record<string, { name: string; description: string }>> = {
-  'teknoloji': {
-    'yazilim-gelistirme': { name: 'Yazılım Geliştirme', description: 'Web, mobil ve masaüstü uygulamalar' },
-    'siber-guvenlik': { name: 'Siber Güvenlik', description: 'Ağ güvenliği ve veri koruma' },
-    'veri-analizi': { name: 'Veri Analizi', description: 'İş zekası ve büyük veri çözümleri' }
-  }
-};
+import { getSector, getSubSector, getCompanies } from '@/lib/data';
+import CompanyCard from '@/components/CompanyCard';
 
 export default function AltSektorPage({ 
   params 
@@ -74,9 +15,9 @@ export default function AltSektorPage({
   const mainSectorKey = params['ana-sektor'];
   const subSectorKey = params['alt-sektor'];
   
-  const mainSector = sectorsData[mainSectorKey];
-  const subSector = subSectorsData[mainSectorKey]?.[subSectorKey];
-  const companies = companiesData[mainSectorKey]?.[subSectorKey] || [];
+  const mainSector = getSector(mainSectorKey);
+  const subSector = getSubSector(mainSectorKey, subSectorKey);
+  const companies = getCompanies(mainSectorKey, subSectorKey);
 
   if (!mainSector || !subSector) {
     notFound();
@@ -125,55 +66,12 @@ export default function AltSektorPage({
       {companies.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {companies.map((company) => (
-            <div
+            <CompanyCard
               key={company.id}
-              className="bg-white rounded-lg shadow-md p-6 border hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{company.name}</h3>
-                    {company.isVerified && (
-                      <div className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                        ✓ Doğrulanmış
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 mb-2">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {company.location}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                    {company.rating} ({company.reviewCount} değerlendirme)
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-                {company.description}
-              </p>
-
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-2">
-                  {company.services.slice(0, 3).map((service, index) => (
-                    <span
-                      key={index}
-                      className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded"
-                    >
-                      {service}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <Link 
-                href={`/sektorler/${mainSectorKey}/${subSectorKey}/${company.id}`}
-                className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm font-medium text-center"
-              >
-                Firma Profilini Görüntüle
-              </Link>
-            </div>
+              company={company}
+              sectorId={mainSectorKey}
+              subSectorId={subSectorKey}
+            />
           ))}
         </div>
       ) : (

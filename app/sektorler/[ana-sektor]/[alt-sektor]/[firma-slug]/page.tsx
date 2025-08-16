@@ -22,169 +22,8 @@ import {
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
+import { getSector, getSubSector, getCompany, type Company } from '@/lib/data';
 
-const companiesData: Record<string, Record<string, Array<{
-  id: string;
-  name: string;
-  description: string;
-  summary: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  services: string[];
-  isVerified: boolean;
-  isEco: boolean;
-  isFeatured: boolean;
-  contactInfo: {
-    phone?: string;
-    whatsapp?: string;
-    email?: string;
-    website?: string;
-    address?: string;
-    mapCoordinates?: { lat: number; lng: number };
-  };
-  socialMedia: {
-    facebook?: string;
-    instagram?: string;
-    linkedin?: string;
-    twitter?: string;
-    youtube?: string;
-  };
-  gallery: {
-    photos: string[];
-    videos: Array<{
-      title: string;
-      url: string;
-      thumbnail: string;
-      platform: 'youtube' | 'vimeo';
-    }>;
-  };
-  businessHours?: {
-    monday?: string;
-    tuesday?: string;
-    wednesday?: string;
-    thursday?: string;
-    friday?: string;
-    saturday?: string;
-    sunday?: string;
-  };
-  yearEstablished?: number;
-  employeeCount?: string;
-  certifications?: string[];
-}>>> = {
-  'teknoloji': {
-    'yazilim-gelistirme': [
-      {
-        id: 'techcorp',
-        name: 'TechCorp Yazılım',
-        description: 'Modern web ve mobil uygulamalar geliştiren deneyimli ekip. 2015 yılından beri sektörde hizmet veren TechCorp, müşteri odaklı yaklaşımı ve yenilikçi çözümleri ile öne çıkmaktadır.',
-        summary: 'Türkiye\'nin öncü yazılım geliştirme şirketlerinden biri olan TechCorp, dijital dönüşüm sürecinizde yanınızda.',
-        location: 'İstanbul, Beşiktaş',
-        rating: 4.8,
-        reviewCount: 127,
-        services: ['Web Development', 'Mobile Apps', 'UI/UX Design', 'Cloud Solutions', 'DevOps'],
-        isVerified: true,
-        isEco: false,
-        isFeatured: true,
-        contactInfo: {
-          phone: '+90 212 555 0123',
-          whatsapp: '+90 532 555 0123',
-          email: 'info@techcorp.com.tr',
-          website: 'https://techcorp.com.tr',
-          address: 'Beşiktaş Mahallesi, Teknoloji Caddesi No:45, 34357 Beşiktaş/İstanbul',
-          mapCoordinates: { lat: 41.0425, lng: 29.0045 }
-        },
-        socialMedia: {
-          facebook: 'techcorpyazilim',
-          instagram: 'techcorp_official',
-          linkedin: 'company/techcorp-yazilim',
-          twitter: 'techcorp_tr'
-        },
-        gallery: {
-          photos: [
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400'
-          ],
-          videos: [
-            {
-              title: 'TechCorp Tanıtım Videosu',
-              url: 'https://youtube.com/watch?v=dQw4w9WgXcQ',
-              thumbnail: '/api/placeholder/400/225',
-              platform: 'youtube'
-            },
-            {
-              title: 'Proje Geliştirme Süreci',
-              url: 'https://vimeo.com/123456789',
-              thumbnail: '/api/placeholder/400/225',
-              platform: 'vimeo'
-            }
-          ]
-        },
-        businessHours: {
-          monday: '09:00 - 18:00',
-          tuesday: '09:00 - 18:00',
-          wednesday: '09:00 - 18:00',
-          thursday: '09:00 - 18:00',
-          friday: '09:00 - 18:00',
-          saturday: 'Kapalı',
-          sunday: 'Kapalı'
-        },
-        yearEstablished: 2015,
-        employeeCount: '25-50',
-        certifications: ['ISO 27001', 'ISO 9001', 'Microsoft Partner']
-      },
-      {
-        id: 'devstudio',
-        name: 'DevStudio',
-        description: 'E-ticaret ve kurumsal yazılım çözümleri sunan köklü yazılım firması. Müşterilerimizin dijital dönüşüm yolculuğunda güvenilir partneri olarak hizmet veriyoruz.',
-        summary: 'E-ticaret ve kurumsal yazılım alanında uzman DevStudio, işletmenizi dijital dünyaya taşıyor.',
-        location: 'Ankara, Çankaya',
-        rating: 4.6,
-        reviewCount: 89,
-        services: ['E-commerce', 'CRM Systems', 'API Development', 'System Integration'],
-        isVerified: true,
-        isEco: true,
-        isFeatured: false,
-        contactInfo: {
-          phone: '+90 312 555 0456',
-          email: 'iletisim@devstudio.com.tr',
-          website: 'https://devstudio.com.tr',
-          address: 'Çankaya Mahallesi, İnovasyon Bulvarı No:23, 06690 Çankaya/Ankara'
-        },
-        socialMedia: {
-          linkedin: 'company/devstudio-ankara',
-          instagram: 'devstudio_ankara'
-        },
-        gallery: {
-          photos: [
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400',
-            '/api/placeholder/600/400'
-          ],
-          videos: []
-        }
-      }
-    ]
-  }
-};
-
-const sectorsData: Record<string, { name: string; icon: string }> = {
-  'teknoloji': { name: 'Teknoloji', icon: '💻' },
-  'saglik': { name: 'Sağlık', icon: '🏥' },
-  'egitim': { name: 'Eğitim', icon: '🎓' }
-};
-
-const subSectorsData: Record<string, Record<string, { name: string; description: string }>> = {
-  'teknoloji': {
-    'yazilim-gelistirme': { name: 'Yazılım Geliştirme', description: 'Web, mobil ve masaüstü uygulamalar' },
-    'siber-guvenlik': { name: 'Siber Güvenlik', description: 'Ağ güvenliği ve veri koruma' },
-    'veri-analizi': { name: 'Veri Analizi', description: 'İş zekası ve büyük veri çözümleri' }
-  }
-};
 
 interface CompanyPageProps {
   params: { 
@@ -202,10 +41,9 @@ export default function CompanyPage({ params }: CompanyPageProps) {
   const subSectorKey = params['alt-sektor'];
   const companySlug = params['firma-slug'];
   
-  const mainSector = sectorsData[mainSectorKey];
-  const subSector = subSectorsData[mainSectorKey]?.[subSectorKey];
-  const companies = companiesData[mainSectorKey]?.[subSectorKey] || [];
-  const company = companies.find(c => c.id === companySlug);
+  const mainSector = getSector(mainSectorKey);
+  const subSector = getSubSector(mainSectorKey, subSectorKey);
+  const company = getCompany(mainSectorKey, subSectorKey, companySlug);
 
   if (!mainSector || !subSector || !company) {
     notFound();
@@ -282,10 +120,9 @@ export default function CompanyPage({ params }: CompanyPageProps) {
               addressRegion: company.location.split(', ')[0],
               addressCountry: 'TR'
             },
-            geo: company.contactInfo.mapCoordinates ? {
+            geo: company.contactInfo.address ? {
               '@type': 'GeoCoordinates',
-              latitude: company.contactInfo.mapCoordinates.lat,
-              longitude: company.contactInfo.mapCoordinates.lng
+              address: company.contactInfo.address
             } : undefined,
             aggregateRating: {
               '@type': 'AggregateRating',
@@ -296,9 +133,10 @@ export default function CompanyPage({ params }: CompanyPageProps) {
             },
             foundingDate: company.yearEstablished?.toString(),
             numberOfEmployees: company.employeeCount,
-            sameAs: Object.values(company.socialMedia).filter(Boolean).map(handle => 
-              handle?.includes('http') ? handle : `https://facebook.com/${handle}`
-            )
+            sameAs: Object.values(company.socialMedia).filter(Boolean).map((handle: unknown) => {
+              const urlHandle = handle as string;
+              return urlHandle.includes('http') ? urlHandle : `https://facebook.com/${urlHandle}`;
+            })
           })
         }}
       />
@@ -408,7 +246,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {company.services.map((service, index) => (
+                {company.services.map((service: string, index: number) => (
                   <span
                     key={index}
                     className="bg-blue-50 text-blue-700 text-sm px-3 py-1 rounded-full"
@@ -494,7 +332,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
 
               {activeTab === 'gallery' && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {company.gallery.photos.map((photo, index) => (
+                  {company.gallery.photos.map((photo: string, index: number) => (
                     <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                       <Image
                         src={photo}
@@ -502,6 +340,9 @@ export default function CompanyPage({ params }: CompanyPageProps) {
                         width={300}
                         height={300}
                         className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                        priority={index < 3}
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                       />
                     </div>
                   ))}
@@ -511,7 +352,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
               {activeTab === 'videos' && (
                 <div className="space-y-6">
                   {company.gallery.videos.length > 0 ? (
-                    company.gallery.videos.map((video, index) => (
+                    company.gallery.videos.map((video: any, index: number) => (
                       <div key={index} className="bg-gray-50 rounded-lg p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">{video.title}</h3>
                         <div className="aspect-video bg-black rounded-lg overflow-hidden">
@@ -539,7 +380,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
               <div className="bg-white rounded-xl border shadow-sm p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Sertifikalar ve Belgeler</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {company.certifications.map((cert, index) => (
+                  {company.certifications.map((cert: string, index: number) => (
                     <div key={index} className="flex items-center gap-3 p-4 border rounded-lg">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <Award className="w-5 h-5 text-blue-600" />
@@ -729,7 +570,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
             )}
 
             {/* Google Maps */}
-            {company.contactInfo.mapCoordinates && (
+            {company.contactInfo.address && (
               <div className="bg-white rounded-xl border shadow-sm p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Konum</h3>
                 <div className="space-y-4">
@@ -738,9 +579,9 @@ export default function CompanyPage({ params }: CompanyPageProps) {
                       {company.contactInfo.address}
                     </p>
                   )}
-                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative">
                     <iframe
-                      src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${company.contactInfo.mapCoordinates.lat},${company.contactInfo.mapCoordinates.lng}&zoom=15`}
+                      src={`https://www.google.com/maps/embed/v1/search?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dQSLUEVfm-ARRo&q=${encodeURIComponent(company.contactInfo.address || company.name + ' ' + company.location)}&zoom=15`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
@@ -751,7 +592,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
                     />
                   </div>
                   <a
-                    href={`https://www.google.com/maps?q=${company.contactInfo.mapCoordinates.lat},${company.contactInfo.mapCoordinates.lng}`}
+                    href={`https://www.google.com/maps/search/${encodeURIComponent(company.contactInfo.address || company.name + ' ' + company.location)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"

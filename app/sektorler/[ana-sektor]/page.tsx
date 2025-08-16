@@ -3,57 +3,23 @@
 import Link from 'next/link';
 import { ChevronRight, ArrowLeft, Building2 } from 'lucide-react';
 import { notFound } from 'next/navigation';
-
-const sectorsData: Record<string, {
-  name: string;
-  icon: string;
-  subSectors: Array<{
-    id: string;
-    name: string;
-    description: string;
-    companyCount: number;
-  }>;
-}> = {
-  'teknoloji': {
-    name: 'Teknoloji',
-    icon: '💻',
-    subSectors: [
-      { id: 'yazilim-gelistirme', name: 'Yazılım Geliştirme', description: 'Web, mobil ve masaüstü uygulamalar', companyCount: 145 },
-      { id: 'siber-guvenlik', name: 'Siber Güvenlik', description: 'Ağ güvenliği ve veri koruma', companyCount: 67 },
-      { id: 'veri-analizi', name: 'Veri Analizi', description: 'İş zekası ve büyük veri çözümleri', companyCount: 89 },
-      { id: 'bulut-hizmetleri', name: 'Bulut Hizmetleri', description: 'AWS, Azure ve Google Cloud', companyCount: 34 },
-      { id: 'yapay-zeka', name: 'Yapay Zeka', description: 'Makine öğrenmesi ve AI çözümleri', companyCount: 23 }
-    ]
-  },
-  'saglik': {
-    name: 'Sağlık',
-    icon: '🏥',
-    subSectors: [
-      { id: 'hastane-yonetimi', name: 'Hastane Yönetimi', description: 'Sağlık kurumu yönetimi', companyCount: 78 },
-      { id: 'eczane-hizmetleri', name: 'Eczane Hizmetleri', description: 'İlaç dağıtımı ve farmasötik', companyCount: 156 },
-      { id: 'laboratuvar', name: 'Laboratuvar', description: 'Tıbbi testler ve analizler', companyCount: 92 },
-      { id: 'tibbi-cihaz', name: 'Tıbbi Cihaz', description: 'Medikal ekipman ve teknoloji', companyCount: 45 }
-    ]
-  },
-  'egitim': {
-    name: 'Eğitim',
-    icon: '🎓',
-    subSectors: [
-      { id: 'universite', name: 'Üniversite', description: 'Yükseköğretim kurumları', companyCount: 29 },
-      { id: 'ozel-ders', name: 'Özel Ders', description: 'Bireysel öğretim hizmetleri', companyCount: 234 },
-      { id: 'online-egitim', name: 'Online Eğitim', description: 'Dijital öğrenme platformları', companyCount: 67 },
-      { id: 'dil-egitimi', name: 'Dil Eğitimi', description: 'Yabancı dil öğretimi', companyCount: 123 }
-    ]
-  }
-};
+import { getSector, getSubSectors, getCompanies } from '@/lib/data';
 
 export default function AnaSektorPage({ params }: { params: { 'ana-sektor': string } }) {
   const sectorKey = params['ana-sektor'];
-  const sector = sectorsData[sectorKey];
+  const sector = getSector(sectorKey);
+  const subSectors = getSubSectors(sectorKey);
 
   if (!sector) {
     notFound();
   }
+
+  const subSectorList = Object.entries(subSectors).map(([id, subSector]) => ({
+    id,
+    name: subSector.name,
+    description: subSector.description,
+    companyCount: getCompanies(sectorKey, id).length
+  }));
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -81,14 +47,14 @@ export default function AnaSektorPage({ params }: { params: { 'ana-sektor': stri
         <div>
           <h1 className="text-4xl font-bold text-gray-900">{sector.name}</h1>
           <p className="text-xl text-gray-600 mt-2">
-            {sector.subSectors.length} alt sektör • {sector.subSectors.reduce((sum, sub) => sum + sub.companyCount, 0)} firma
+            {subSectorList.length} alt sektör • {subSectorList.reduce((sum, sub) => sum + sub.companyCount, 0)} firma
           </p>
         </div>
       </div>
 
       {/* Sub Sectors Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sector.subSectors.map((subSector) => (
+        {subSectorList.map((subSector) => (
           <Link
             key={subSector.id}
             href={`/sektorler/${sectorKey}/${subSector.id}`}

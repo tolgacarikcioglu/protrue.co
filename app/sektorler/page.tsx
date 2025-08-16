@@ -2,18 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-
-const mainSectors = [
-  { id: 'teknoloji', name: 'Teknoloji', icon: '💻', description: 'Yazılım, donanım ve dijital çözümler' },
-  { id: 'saglik', name: 'Sağlık', icon: '🏥', description: 'Tıbbi hizmetler ve sağlık teknolojileri' },
-  { id: 'egitim', name: 'Eğitim', icon: '🎓', description: 'Eğitim kurumları ve öğretim hizmetleri' },
-  { id: 'finans', name: 'Finans', icon: '💰', description: 'Bankacılık, sigortacılık ve yatırım' },
-  { id: 'hukuk', name: 'Hukuk', icon: '⚖️', description: 'Hukuki danışmanlık ve avukatlık hizmetleri' },
-  { id: 'insaat', name: 'İnşaat', icon: '🏗️', description: 'Yapı, altyapı ve mimarlık projeleri' },
-  { id: 'turizm', name: 'Turizm', icon: '✈️', description: 'Seyahat, konaklama ve rehberlik' },
-  { id: 'gida', name: 'Gıda', icon: '🍽️', description: 'Gıda üretimi, restoran ve catering' },
-  { id: 'tekstil', name: 'Tekstil', icon: '👔', description: 'Moda, dokuma ve konfeksiyon' }
-];
+import { getAllSectors } from '@/lib/data';
 
 export default function SektorlerPage() {
   return (
@@ -27,7 +16,7 @@ export default function SektorlerPage() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {mainSectors.map((sector) => (
+        {getAllSectors().map((sector) => (
           <Link 
             key={sector.id} 
             href={`/sektorler/${sector.id}`}
