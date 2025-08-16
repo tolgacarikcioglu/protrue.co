@@ -1,0 +1,8 @@
+<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clean text-based logo for Protrue.co -->
+  <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="white">
+    Protrue.co
+  </text>
+  <!-- Optional accent dot -->
+  <circle cx="165" cy="20" r="3" fill="#10b981"/>
+</svg>

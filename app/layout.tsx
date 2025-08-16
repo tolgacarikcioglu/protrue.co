@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <nav className="bg-blue-600 text-white p-4">
+        <nav className="bg-slate-900 text-white p-4">
           <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-xl font-bold">Protrue.co</h1>
+            <div className="flex items-center">
+              <Image src="/logo.svg" alt="Protrue.co" width={180} height={40} className="h-8" />
+            </div>
             <div className="space-x-4">
               <a href="/" className="hover:underline">Ana Sayfa</a>
               <a href="/sectors" className="hover:underline">Sektörler</a>
