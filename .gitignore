@@ -1,0 +1,10 @@
+node_modules
+.next
+.vercel
+dist
+build
+.turbo
+.env.local
+.env
+*.log
+package-lock.json
