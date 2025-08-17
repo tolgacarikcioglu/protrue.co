@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "clean": "rm -rf .next node_modules package-lock.json"
+    "clean": "rm -rf .next node_modules package-lock.json",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.10.0",
