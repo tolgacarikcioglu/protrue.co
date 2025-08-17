@@ -5,21 +5,15 @@ import EmailProvider from 'next-auth/providers/email'
 const authOptions: NextAuthOptions = {
   providers: [
     EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
+      server: process.env.EMAIL_SERVER_URL || "smtp://localhost:1025",
+      from: process.env.EMAIL_FROM || "noreply@protrue.co",
     }),
   ],
   pages: {
     signIn: '/auth/signin',
     verifyRequest: '/auth/verify-request',
   },
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session, token }) {
       return session
@@ -28,6 +22,7 @@ const authOptions: NextAuthOptions = {
       return token
     },
   },
+  debug: process.env.NODE_ENV === 'development',
 }
 
 const handler = NextAuth(authOptions)
