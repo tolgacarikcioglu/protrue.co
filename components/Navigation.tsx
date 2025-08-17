@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   return (
     <nav className="bg-[#0B1220] text-white p-4">
@@ -14,10 +16,25 @@ export default function Navigation() {
             Protrue.co
           </Link>
         </div>
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex space-x-4 items-center">
           <a href="/sektorler" className="hover:underline">Sektörler</a>
           <a href="/about" className="hover:underline">Hakkımızda</a>
           <a href="/pricing" className="hover:underline">Abonelik</a>
+          {session ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm">Merhaba, {session.user?.email}</span>
+              <button 
+                onClick={() => signOut()}
+                className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+              >
+                Çıkış
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth/signin" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+              Giriş Yap
+            </Link>
+          )}
         </div>
         <div className="md:hidden">
           <button 
@@ -36,6 +53,21 @@ export default function Navigation() {
             <a href="/sektorler" className="block py-2 hover:text-gray-200">Sektörler</a>
             <a href="/about" className="block py-2 hover:text-gray-200">Hakkımızda</a>
             <a href="/pricing" className="block py-2 hover:text-gray-200">Abonelik</a>
+            {session ? (
+              <div className="border-t border-gray-700 pt-2 mt-2">
+                <div className="text-sm text-gray-300 py-2">{session.user?.email}</div>
+                <button 
+                  onClick={() => signOut()}
+                  className="block w-full text-left py-2 text-red-400 hover:text-red-300"
+                >
+                  Çıkış Yap
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth/signin" className="block py-2 text-blue-400 hover:text-blue-300 border-t border-gray-700 pt-2 mt-2">
+                Giriş Yap
+              </Link>
+            )}
           </div>
         </div>
       )}
