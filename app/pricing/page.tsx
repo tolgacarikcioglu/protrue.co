@@ -14,7 +14,7 @@ const pricingPlans = [
       'Temel analitik raporlar'
     ],
     highlighted: false,
-    buttonText: 'Başlangıç Paketi'
+    buttonText: 'Başlangıç Planı'
   },
   {
     name: 'Profesyonel',
@@ -49,7 +49,7 @@ const pricingPlans = [
       'Eğitim ve danışmanlık'
     ],
     highlighted: false,
-    buttonText: 'Kurumsal Çözüm'
+    buttonText: 'Kurumsal Plan'
   }
 ];
 
@@ -58,15 +58,15 @@ export default function PricingPage() {
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl font-bold mb-6">Fiyatlar & Paketler</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          İhtiyacınıza uygun planı seçin ve profesyonel hizmet dünyasında yerinizi alın.
-          Tüm paketlerde 14 gün ücretsiz deneme imkanı.
+        <h1 className="text-2xl md:text-4xl font-bold mb-6">Abonelik Planları</h1>
+        <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
+          İhtiyacınıza uygun abonelik planını seçin ve profesyonel hizmet dünyasında yerinizi alın.
+          Tüm planlarda 14 gün ücretsiz deneme imkanı.
         </p>
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid md:grid-cols-3 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 px-4">
         {pricingPlans.map((plan, index) => (
           <div
             key={index}
@@ -130,7 +130,7 @@ export default function PricingPage() {
       <div className="text-center bg-gray-50 rounded-2xl p-8">
         <h2 className="text-2xl font-bold mb-4">Sorularınız mı var?</h2>
         <p className="text-gray-600 mb-6">
-          Hangi paketin sizin için uygun olduğundan emin değil misiniz? 
+          Hangi planın sizin için uygun olduğundan emin değil misiniz? 
           Uzman ekibimiz size en uygun çözümü bulmanızda yardımcı olacak.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -138,7 +138,7 @@ export default function PricingPage() {
             Ücretsiz Danışmanlık
           </button>
           <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors">
-            Paket Karşılaştırması
+            Plan Karşılaştırması
           </button>
         </div>
       </div>

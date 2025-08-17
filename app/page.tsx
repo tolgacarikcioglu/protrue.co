@@ -15,9 +15,9 @@ export default function HomePage() {
             19 ana sektörde 130+ kategori ile güvenilir profesyonellerle bağlantı kur.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4 sm:gap-0 justify-center items-center">
-            <button className="bg-white text-[#0B1220] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
+            <Link href="/pricing" className="bg-white text-[#0B1220] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 inline-block">
               Hemen Başla
-            </button>
+            </Link>
             <Link href="/sektorler" className="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#0B1220] inline-block">
               Sektörleri Keşfet
             </Link>
@@ -123,9 +123,9 @@ export default function HomePage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">Hemen Başlayın</h2>
           <p className="text-lg md:text-xl mb-8 text-white/90 px-4">Profesyonel ağınızı büyütün veya ihtiyacınız olan uzmana ulaşın</p>
-          <button className="bg-white text-[#0B1220] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 border-2 border-transparent hover:border-[#1877F2] transition-all">
+          <Link href="/pricing" className="bg-white text-[#0B1220] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 border-2 border-transparent hover:border-[#1877F2] transition-all inline-block">
             Ücretsiz Kayıt Ol
-          </button>
+          </Link>
         </div>
       </section>
     </div>
