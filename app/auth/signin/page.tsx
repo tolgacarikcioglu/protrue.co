@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 
 export default function SignIn() {
@@ -15,13 +15,16 @@ export default function SignIn() {
     setMessage('');
 
     try {
-      const result = await signIn('email', {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOtp({
         email,
-        redirect: false,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
-      if (result?.error) {
-        setMessage('Giriş yaparken bir hata oluştu.');
+      if (error) {
+        setMessage('Giriş yaparken bir hata oluştu: ' + error.message);
       } else {
         setMessage('E-posta adresinize giriş bağlantısı gönderildi!');
       }
@@ -103,7 +106,15 @@ export default function SignIn() {
 
           <div className="mt-6">
             <button
-              onClick={() => signIn('google')}
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                  },
+                });
+              }}
               className="w-full inline-flex justify-center py-3 px-4 border-2 border-gray-300 rounded-lg shadow-md bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

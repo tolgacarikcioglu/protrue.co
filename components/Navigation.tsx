@@ -1,12 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   return (
     <nav className="bg-[#0B1220] text-white p-4">
@@ -20,11 +42,13 @@ export default function Navigation() {
           <a href="/sektorler" className="hover:underline">Sektörler</a>
           <a href="/about" className="hover:underline">Hakkımızda</a>
           <a href="/pricing" className="hover:underline">Abonelik</a>
-          {session ? (
+          {user ? (
             <div className="flex items-center space-x-4">
-              <span className="text-sm">Merhaba, {session.user?.email}</span>
+              <span className="text-sm">Merhaba, {user.email}</span>
               <button 
-                onClick={() => signOut()}
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                }}
                 className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
               >
                 Çıkış
@@ -53,11 +77,13 @@ export default function Navigation() {
             <a href="/sektorler" className="block py-2 hover:text-gray-200">Sektörler</a>
             <a href="/about" className="block py-2 hover:text-gray-200">Hakkımızda</a>
             <a href="/pricing" className="block py-2 hover:text-gray-200">Abonelik</a>
-            {session ? (
+            {user ? (
               <div className="border-t border-gray-700 pt-2 mt-2">
-                <div className="text-sm text-gray-300 py-2">{session.user?.email}</div>
+                <div className="text-sm text-gray-300 py-2">{user.email}</div>
                 <button 
-                  onClick={() => signOut()}
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                  }}
                   className="block w-full text-left py-2 text-red-400 hover:text-red-300"
                 >
                   Çıkış Yap
