@@ -8,13 +8,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "clean": "rm -rf .next node_modules package-lock.json",
-    "postinstall": "prisma generate"
+    "clean": "rm -rf .next node_modules package-lock.json"
   },
   "dependencies": {
     "@supabase/ssr": "0.6.1",
