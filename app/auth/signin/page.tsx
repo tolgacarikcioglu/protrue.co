@@ -6,6 +6,8 @@ import Link from 'next/link';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,10 +21,22 @@ export default function SignIn() {
       const supabase = createClient();
       
       if (isSignUp) {
-        // Kayıt ol
+        // Kayıt ol - şifre kontrolü
+        if (password.length < 6) {
+          setMessage('Şifre en az 6 karakter olmalıdır.');
+          setIsLoading(false);
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          setMessage('Şifreler eşleşmiyor.');
+          setIsLoading(false);
+          return;
+        }
+        
         const { error } = await supabase.auth.signUp({
           email,
-          password: 'temp-password', // Supabase magic link için geçici şifre
+          password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
@@ -35,17 +49,19 @@ export default function SignIn() {
         }
       } else {
         // Giriş yap
-        const { error } = await supabase.auth.signInWithOtp({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
+          password,
         });
 
         if (error) {
           setMessage('Giriş yaparken bir hata oluştu: ' + error.message);
         } else {
-          setMessage('E-posta adresinize giriş bağlantısı gönderildi!');
+          setMessage('Giriş başarılı! Yönlendiriliyorsunuz...');
+          // Başarılı giriş sonrası ana sayfaya yönlendir
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
         }
       }
     } catch (error) {
@@ -111,11 +127,81 @@ export default function SignIn() {
               </div>
             </div>
 
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Şifre
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#0B1220] focus:border-[#0B1220] sm:text-sm"
+                  placeholder={isSignUp ? "En az 6 karakter" : "Şifreniz"}
+                />
+              </div>
+            </div>
+
+            {isSignUp && (
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Şifre Tekrarı
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#0B1220] focus:border-[#0B1220] sm:text-sm"
+                    placeholder="Şifrenizi tekrar girin"
+                  />
+                </div>
+              </div>
+            )}
+
             {message && (
               <div className={`text-sm p-3 rounded-md ${
-                message.includes('gönderildi') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                message.includes('başarılı') || message.includes('Yönlendiriliyorsunuz') 
+                  ? 'bg-green-50 text-green-700' 
+                  : 'bg-red-50 text-red-700'
               }`}>
                 {message}
+              </div>
+            )}
+
+            {!isSignUp && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email) {
+                      setMessage('Şifre sıfırlama için önce e-posta adresinizi girin.');
+                      return;
+                    }
+                    setIsLoading(true);
+                    const supabase = createClient();
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                      redirectTo: `${window.location.origin}/auth/reset-password`,
+                    });
+                    setIsLoading(false);
+                    if (error) {
+                      setMessage('Şifre sıfırlama e-postası gönderilemedi: ' + error.message);
+                    } else {
+                      setMessage('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+                    }
+                  }}
+                  className="text-sm text-[#0B1220] hover:underline"
+                >
+                  Şifremi unuttum
+                </button>
               </div>
             )}
 
@@ -125,7 +211,7 @@ export default function SignIn() {
                 disabled={isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0B1220] hover:bg-[#0F2A5F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B1220] disabled:opacity-50"
               >
-                {isLoading ? 'Gönderiliyor...' : (isSignUp ? 'E-posta ile kayıt ol' : 'E-posta ile giriş yap')}
+{isLoading ? (isSignUp ? 'Kayıt oluşturuluyor...' : 'Giriş yapılıyor...') : (isSignUp ? 'Kayıt ol' : 'Giriş yap')}
               </button>
             </div>
           </form>
@@ -168,7 +254,7 @@ export default function SignIn() {
             <div className="text-center text-sm text-gray-600">
               {isSignUp 
                 ? 'Hesabınızı oluşturmak için e-posta adresinizi onaylamanız gerekecek.'
-                : 'E-posta adresinize güvenli giriş bağlantısı göndereceğiz. Şifre gerekmez!'
+                : 'E-posta ve şifre ile güvenli giriş yapın.'
               }
             </div>
           </div>
