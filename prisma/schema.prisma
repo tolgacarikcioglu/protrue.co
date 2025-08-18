@@ -6,9 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 // =============================================================================
@@ -21,12 +20,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -55,7 +54,7 @@ model User {
   
   // Profile information
   phone         String?
-  bio           String?   @db.Text
+  bio           String?
   website       String?
   location      String?
   
@@ -98,7 +97,7 @@ model Category {
   name        String
   slug        String  @unique
   parentSlug  String? @map("parent_slug")
-  description String? @db.Text
+  description String?
   icon        String?
   isActive    Boolean @default(true) @map("is_active")
   sortOrder   Int     @default(0) @map("sort_order")
@@ -130,7 +129,7 @@ model Company {
   id          String        @id @default(cuid())
   name        String
   slug        String        @unique
-  description String?       @db.Text
+  description String?
   website     String?
   email       String?
   phone       String?
@@ -159,7 +158,7 @@ model Company {
   // Media
   logo           String?
   coverImage     String?   @map("cover_image")
-  gallery        String[]  @default([])
+  gallery        String    @default("")
   
   // SEO
   seoTitle       String?   @map("seo_title")
@@ -233,7 +232,7 @@ model Review {
   id        String @id @default(cuid())
   rating    Int    // 1-5 stars
   title     String?
-  content   String @db.Text
+  content   String
   isVerified Boolean @default(false) @map("is_verified")
   
   // Relations
