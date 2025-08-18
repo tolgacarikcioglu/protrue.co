@@ -8,6 +8,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,17 +17,36 @@ export default function SignIn() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setMessage('Giriş yaparken bir hata oluştu: ' + error.message);
+      
+      if (isSignUp) {
+        // Kayıt ol
+        const { error } = await supabase.auth.signUp({
+          email,
+          password: 'temp-password', // Supabase magic link için geçici şifre
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+        
+        if (error) {
+          setMessage('Kayıt olurken bir hata oluştu: ' + error.message);
+        } else {
+          setMessage('Kayıt başarılı! E-posta adresinizi onaylamak için gelen bağlantıya tıklayın.');
+        }
       } else {
-        setMessage('E-posta adresinize giriş bağlantısı gönderildi!');
+        // Giriş yap
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+
+        if (error) {
+          setMessage('Giriş yaparken bir hata oluştu: ' + error.message);
+        } else {
+          setMessage('E-posta adresinize giriş bağlantısı gönderildi!');
+        }
       }
     } catch (error) {
       setMessage('Beklenmeyen bir hata oluştu.');
@@ -42,13 +62,30 @@ export default function SignIn() {
           <h2 className="text-3xl font-bold text-[#0B1220]">Protrue.co</h2>
         </Link>
         <h2 className="mt-6 text-center text-2xl md:text-3xl font-bold text-gray-900">
-          Hesabınıza giriş yapın
+          {isSignUp ? 'Hesap oluşturun' : 'Hesabınıza giriş yapın'}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          veya{' '}
-          <Link href="/pricing" className="font-medium text-[#0B1220] hover:underline">
-            abonelik planlarını inceleyin
-          </Link>
+          {isSignUp ? (
+            <>
+              Zaten hesabınız var mı?{' '}
+              <button 
+                onClick={() => setIsSignUp(false)}
+                className="font-medium text-[#0B1220] hover:underline"
+              >
+                Giriş yapın
+              </button>
+            </>
+          ) : (
+            <>
+              Hesabınız yok mu?{' '}
+              <button 
+                onClick={() => setIsSignUp(true)}
+                className="font-medium text-[#0B1220] hover:underline"
+              >
+                Kayıt olun
+              </button>
+            </>
+          )}
         </p>
       </div>
 
@@ -88,7 +125,7 @@ export default function SignIn() {
                 disabled={isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0B1220] hover:bg-[#0F2A5F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B1220] disabled:opacity-50"
               >
-                {isLoading ? 'Gönderiliyor...' : 'E-posta ile giriş yap'}
+                {isLoading ? 'Gönderiliyor...' : (isSignUp ? 'E-posta ile kayıt ol' : 'E-posta ile giriş yap')}
               </button>
             </div>
           </form>
@@ -129,8 +166,10 @@ export default function SignIn() {
 
           <div className="mt-6">
             <div className="text-center text-sm text-gray-600">
-              E-posta adresinize güvenli giriş bağlantısı göndereceğiz.
-              Şifre gerekmez!
+              {isSignUp 
+                ? 'Hesabınızı oluşturmak için e-posta adresinizi onaylamanız gerekecek.'
+                : 'E-posta adresinize güvenli giriş bağlantısı göndereceğiz. Şifre gerekmez!'
+              }
             </div>
           </div>
         </div>
