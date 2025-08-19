@@ -23,6 +23,8 @@ import {
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
 import { getSector, getSubSector, getCompany, type Company } from '@/lib/data';
+import { useUser } from '@/hooks/useUser';
+import { canEditCompany } from '@/lib/types';
 
 
 interface CompanyPageProps {
@@ -36,6 +38,7 @@ interface CompanyPageProps {
 export default function CompanyPage({ params }: CompanyPageProps) {
   const [activeTab, setActiveTab] = useState<'gallery' | 'videos'>('gallery');
   const [isEditMode, setIsEditMode] = useState(false);
+  const { user, userProfile, ownerships, loading: userLoading } = useUser();
   
   const mainSectorKey = params['ana-sektor'];
   const subSectorKey = params['alt-sektor'];
@@ -44,6 +47,14 @@ export default function CompanyPage({ params }: CompanyPageProps) {
   const mainSector = getSector(mainSectorKey);
   const subSector = getSubSector(mainSectorKey, subSectorKey);
   const company = getCompany(mainSectorKey, subSectorKey, companySlug);
+  
+  // Check if user can edit this company
+  const canEdit = user && userProfile && canEditCompany(
+    userProfile.role, 
+    user.id, 
+    company?.id || '', 
+    ownerships
+  );
 
   if (!mainSector || !subSector || !company) {
     notFound();
@@ -229,13 +240,25 @@ export default function CompanyPage({ params }: CompanyPageProps) {
                       Kaydet
                     </button>
                   )}
-                  {!isEditMode && (
+                  {!isEditMode && canEdit && (
                     <button
                       onClick={() => setIsEditMode(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
                     >
                       <Edit className="w-4 h-4" />
                       Düzenle
+                    </button>
+                  )}
+                  {!canEdit && user && (
+                    <button
+                      onClick={() => {
+                        // TODO: Open ownership request modal
+                        alert('Firma sahipliği talep etme özelliği yakında eklenecek!');
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Bu Benim Firmam
                     </button>
                   )}
                 </div>
@@ -266,7 +289,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
             <div className="bg-white rounded-xl border shadow-sm p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Firma Hakkında</h2>
-                {isEditMode && (
+                {isEditMode && canEdit && (
                   <button className="text-blue-600 hover:text-blue-700">
                     <Edit className="w-5 h-5" />
                   </button>
@@ -399,7 +422,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
             <div className="bg-white rounded-xl border shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900">İletişim Bilgileri</h3>
-                {isEditMode && (
+                {isEditMode && canEdit && (
                   <button className="text-blue-600 hover:text-blue-700">
                     <Edit className="w-4 h-4" />
                   </button>
