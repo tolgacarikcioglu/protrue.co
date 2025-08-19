@@ -5,64 +5,24 @@ import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 
 export default function SignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     setIsLoading(true);
     setMessage('');
-
+    
     try {
       const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
       
-      if (isSignUp) {
-        // Kayıt ol - şifre kontrolü
-        if (password.length < 6) {
-          setMessage('Şifre en az 6 karakter olmalıdır.');
-          setIsLoading(false);
-          return;
-        }
-        
-        if (password !== confirmPassword) {
-          setMessage('Şifreler eşleşmiyor.');
-          setIsLoading(false);
-          return;
-        }
-        
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        });
-        
-        if (error) {
-          setMessage('Kayıt olurken bir hata oluştu: ' + error.message);
-        } else {
-          setMessage('Kayıt başarılı! E-posta adresinizi onaylamak için gelen bağlantıya tıklayın.');
-        }
-      } else {
-        // Giriş yap
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          setMessage('Giriş yaparken bir hata oluştu: ' + error.message);
-        } else {
-          setMessage('Giriş başarılı! Yönlendiriliyorsunuz...');
-          // Başarılı giriş sonrası ana sayfaya yönlendir
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 1000);
-        }
+      if (error) {
+        setMessage(`${provider === 'google' ? 'Google' : 'Apple'} ile giriş yaparken bir hata oluştu: ${error.message}`);
       }
     } catch (error) {
       setMessage('Beklenmeyen bir hata oluştu.');
@@ -78,167 +38,30 @@ export default function SignIn() {
           <h2 className="text-3xl font-bold text-[#0B1220]">Protrue.co</h2>
         </Link>
         <h2 className="mt-6 text-center text-2xl md:text-3xl font-bold text-gray-900">
-          {isSignUp ? 'Hesap oluşturun' : 'Hesabınıza giriş yapın'}
+          Hesabınıza giriş yapın
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          {isSignUp ? (
-            <>
-              Zaten hesabınız var mı?{' '}
-              <button 
-                onClick={() => setIsSignUp(false)}
-                className="font-medium text-[#0B1220] hover:underline"
-              >
-                Giriş yapın
-              </button>
-            </>
-          ) : (
-            <>
-              Hesabınız yok mu?{' '}
-              <button 
-                onClick={() => setIsSignUp(true)}
-                className="font-medium text-[#0B1220] hover:underline"
-              >
-                Kayıt olun
-              </button>
-            </>
-          )}
+          Google veya Apple hesabınız ile{' '}
+          <Link href="/pricing" className="font-medium text-[#0B1220] hover:underline">
+            hızlı ve güvenli giriş
+          </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                E-posta adresi
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#0B1220] focus:border-[#0B1220] sm:text-sm"
-                  placeholder="ornek@email.com"
-                />
-              </div>
+          {message && (
+            <div className="mb-6 text-sm p-3 rounded-md bg-red-50 text-red-700">
+              {message}
             </div>
+          )}
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Şifre
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#0B1220] focus:border-[#0B1220] sm:text-sm"
-                  placeholder={isSignUp ? "En az 6 karakter" : "Şifreniz"}
-                />
-              </div>
-            </div>
-
-            {isSignUp && (
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Şifre Tekrarı
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#0B1220] focus:border-[#0B1220] sm:text-sm"
-                    placeholder="Şifrenizi tekrar girin"
-                  />
-                </div>
-              </div>
-            )}
-
-            {message && (
-              <div className={`text-sm p-3 rounded-md ${
-                message.includes('başarılı') || message.includes('Yönlendiriliyorsunuz') 
-                  ? 'bg-green-50 text-green-700' 
-                  : 'bg-red-50 text-red-700'
-              }`}>
-                {message}
-              </div>
-            )}
-
-            {!isSignUp && (
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!email) {
-                      setMessage('Şifre sıfırlama için önce e-posta adresinizi girin.');
-                      return;
-                    }
-                    setIsLoading(true);
-                    const supabase = createClient();
-                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                      redirectTo: `${window.location.origin}/auth/reset-password`,
-                    });
-                    setIsLoading(false);
-                    if (error) {
-                      setMessage('Şifre sıfırlama e-postası gönderilemedi: ' + error.message);
-                    } else {
-                      setMessage('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
-                    }
-                  }}
-                  className="text-sm text-[#0B1220] hover:underline"
-                >
-                  Şifremi unuttum
-                </button>
-              </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0B1220] hover:bg-[#0F2A5F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B1220] disabled:opacity-50"
-              >
-{isLoading ? (isSignUp ? 'Kayıt oluşturuluyor...' : 'Giriş yapılıyor...') : (isSignUp ? 'Kayıt ol' : 'Giriş yap')}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Veya</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6">
+          <div className="space-y-4">
+            {/* Google Sign In */}
             <button
-              onClick={async () => {
-                const supabase = createClient();
-                await supabase.auth.signInWithOAuth({
-                  provider: 'google',
-                  options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                  },
-                });
-              }}
-              className="w-full inline-flex justify-center py-3 px-4 border-2 border-gray-300 rounded-lg shadow-md bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+              onClick={() => handleOAuthSignIn('google')}
+              disabled={isLoading}
+              className="w-full inline-flex justify-center py-3 px-4 border-2 border-gray-300 rounded-lg shadow-md bg-white text-base font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -248,14 +71,23 @@ export default function SignIn() {
               </svg>
               Google ile giriş yap
             </button>
+
+            {/* Apple Sign In */}
+            <button
+              onClick={() => handleOAuthSignIn('apple')}
+              disabled={isLoading}
+              className="w-full inline-flex justify-center py-3 px-4 border-2 border-black rounded-lg shadow-md bg-black text-base font-semibold text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 disabled:opacity-50"
+            >
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Apple ile giriş yap
+            </button>
           </div>
 
           <div className="mt-6">
             <div className="text-center text-sm text-gray-600">
-              {isSignUp 
-                ? 'Hesabınızı oluşturmak için e-posta adresinizi onaylamanız gerekecek.'
-                : 'E-posta ve şifre ile güvenli giriş yapın.'
-              }
+              Güvenli ve hızlı giriş için sosyal hesaplarınızı kullanın.
             </div>
           </div>
         </div>
