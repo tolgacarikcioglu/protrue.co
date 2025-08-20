@@ -4,31 +4,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { useUser } from '@/hooks/useUser';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, userProfile, isAdmin, isModerator } = useUser();
   const supabase = createClient();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
 
   return (
     <nav className="bg-[#0B1220] text-white p-4">
@@ -42,6 +24,11 @@ export default function Navigation() {
           <a href="/sektorler" className="hover:underline">Sektörler</a>
           <a href="/about" className="hover:underline">Hakkımızda</a>
           <a href="/pricing" className="hover:underline">Abonelik</a>
+          {(isAdmin || isModerator) && (
+            <Link href="/admin" className="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm font-medium">
+              Admin
+            </Link>
+          )}
           {user ? (
             <div className="flex items-center space-x-4">
               <span className="text-sm">Merhaba, {user.email}</span>

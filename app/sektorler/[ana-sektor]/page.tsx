@@ -14,12 +14,7 @@ export default function AnaSektorPage({ params }: { params: { 'ana-sektor': stri
     notFound();
   }
 
-  const subSectorList = Object.entries(subSectors).map(([id, subSector]) => ({
-    id,
-    name: subSector.name,
-    description: subSector.description,
-    companyCount: getCompanies(sectorKey, id).length
-  }));
+  const subSectorList = subSectors;
 
   return (
     <div className="container mx-auto px-4 py-12">

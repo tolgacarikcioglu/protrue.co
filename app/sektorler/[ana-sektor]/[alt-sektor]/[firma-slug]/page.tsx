@@ -25,6 +25,7 @@ import { useState } from 'react';
 import { getSector, getSubSector, getCompany, type Company } from '@/lib/data';
 import { useUser } from '@/hooks/useUser';
 import { canEditCompany } from '@/lib/types';
+import OwnershipRequestModal from '@/components/OwnershipRequestModal';
 
 
 interface CompanyPageProps {
@@ -38,6 +39,7 @@ interface CompanyPageProps {
 export default function CompanyPage({ params }: CompanyPageProps) {
   const [activeTab, setActiveTab] = useState<'gallery' | 'videos'>('gallery');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showOwnershipModal, setShowOwnershipModal] = useState(false);
   const { user, userProfile, ownerships, loading: userLoading } = useUser();
   
   const mainSectorKey = params['ana-sektor'];
@@ -251,10 +253,7 @@ export default function CompanyPage({ params }: CompanyPageProps) {
                   )}
                   {!canEdit && user && (
                     <button
-                      onClick={() => {
-                        // TODO: Open ownership request modal
-                        alert('Firma sahipliği talep etme özelliği yakında eklenecek!');
-                      }}
+                      onClick={() => setShowOwnershipModal(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                       <Shield className="w-4 h-4" />
@@ -644,6 +643,15 @@ export default function CompanyPage({ params }: CompanyPageProps) {
             </div>
           </div>
         )}
+
+        {/* Ownership Request Modal */}
+        <OwnershipRequestModal
+          isOpen={showOwnershipModal}
+          onClose={() => setShowOwnershipModal(false)}
+          companyName={company.name}
+          companyId={company.id}
+          userId={user?.id || ''}
+        />
       </div>
     </>
   );
